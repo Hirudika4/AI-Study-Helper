@@ -553,7 +553,6 @@ def app() -> any {
     let [summaryText, setSummaryText] = useState("");
     let [explanationText, setExplanationText] = useState("");
     let [flashcardText, setFlashcardText] = useState("");
-
     let [isLoading, setIsLoading] = useState(False);
 
     # quiz answer box state
@@ -715,8 +714,6 @@ def app() -> any {
         setIsLoading(False);
     }
   
-
-
 
     return <div style={{
         "minHeight": "100vh",
