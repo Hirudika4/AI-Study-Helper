@@ -67,6 +67,6 @@ Everything clean, instant, and focused.
 - Immediate feedback
 
 ## 🧭 High-Level Architecture Overview
-
+![WhatsApp Image 2025-12-03 at 21 40 10_f2f906b4](https://github.com/user-attachments/assets/5d556e79-2faa-4ad2-9fb6-29497b571985)
 
 
