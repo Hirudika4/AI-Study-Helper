@@ -1,7 +1,7 @@
 import from byllm.lib { Model }
 import time;
 import from tavily { TavilyClient }
-import os;   # <-- correct way
+import os;   
 
 glob llm = Model(model_name="gemini/gemini-2.5-flash");
 glob tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"));
@@ -72,6 +72,11 @@ node QuizHandling {
     # Tool: store a new quiz question
     def create_quiz(question: str, options: str, correct_answer: str) -> str {
         print(f"[Quiz Created]: {question}");
+
+        # NEW: convert literal "\n" to actual newlines
+        question = question.replace("\\n", "\n");
+        options  = options.replace("\\n", "\n");
+
         quiz_created = Quiz(
             question=question,
             options=options,
@@ -113,13 +118,14 @@ node QuizHandling {
             + "- Each question must be in this exact format:\n"
             + "Question 1:\n"
             + "<question text>\n"
-            + "1. option one\\n"
-            + "2. option two\\n"
-            + "3. option three\\n"
-            + "4. option four\\n"
+            + "1. option one\n"
+            + "2. option two\n"
+            + "3. option three\n"
+            + "4. option four\n"
             + "Then continue with Question 2, Question 3, etc.\n"
             + "Do NOT add any extra explanation or commentary around the quiz and to create quiz please use web search tool when needed.\n"
         );
+
 
         # LLM decides how many questions to create
         response = self.route_and_generate(full_prompt);
@@ -149,6 +155,8 @@ node QuizHandling {
         # if not quiz_text {
         #     quiz_text = response;
         # }
+
+        quiz_text = quiz_text.replace("\\n", "\n");
         print(quiz_text);
 
         # THIS is what React sees in result.reports
@@ -239,15 +247,30 @@ node FlashcardHandling {
 
     can execute with task_manager entry {
         print("[FlashcardHandling Node Activated]");
-        full_prompt  = (visitor.cur_task.task + "\n\n"
+
+        full_prompt = (
+            visitor.cur_task.task + "\n\n"
+            + "You are a flashcard generator.\n"
+            + "Create flashcards ONLY in **JSON** with this exact structure:\n"
+            + "[\n"
+            + '  { "front": "Question 1", "back": "Short answer 1" },\n'
+            + '  { "front": "Question 2", "back": "Short answer 2" }\n'
+            + "]\n\n"
+            + "- Each `front` should be a clear question from the text.\n"
+            + "- Each `back` should be a short, direct answer (1–2 sentences).\n"
+            + "- Return ONLY the JSON array – no backticks, no explanation.\n\n"
             + "Here is the source text for flashcards:\n"
             + visitor.utterance
         );
+
         response = self.route_and_run(full_prompt);
         print("→", response);
+
+        # Just pass what the LLM responded to the frontend
         report response;
     }
 }
+
 
 #   ROUTING METADATA
 
@@ -405,23 +428,5 @@ walker quiz_answer_walker {
             report msg;
         }
 
-        # Recalculate student level after this answer
-        
     }
 }
-
-
-
-# with entry {
-#     # Ask for the main user request in the terminal
-#     #root ++> student_level(level="beginner");
-#     utter = input("Enter your request: ");
-#     root spawn task_manager(utterance = utter);
-#     root spawn levelwalker();
-#     root spawn explainationwalker(utterance = utter);
-    
-# }
-
-
-
-    

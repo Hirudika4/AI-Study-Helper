@@ -105,6 +105,7 @@ def RenderQuizCard(props: any) -> any {
             "fontSize": "14px",
             "color": "#020617",
             "whiteSpace": "pre-wrap",
+            "lineHeight": "1.8", 
             "overflowY": "auto",
             "maxHeight": "210px",
             "marginBottom": "12px",
@@ -115,6 +116,13 @@ def RenderQuizCard(props: any) -> any {
             "flex": 1
         }}>
             {props.quizText or "Ask for a quiz in your prompt to see MCQs here."}
+            # {
+            #     (props.quizText
+            #         ? props.quizText.replace(/\\n/g, "\n")
+            #         : "Ask for a quiz in your prompt to see MCQs here."
+            #     )
+            # }
+
         </div>
     
         <div style={{
@@ -193,6 +201,7 @@ def app() -> any {
 
     # quiz answer box state
     let [quizAnswer, setQuizAnswer] = useState("");
+    let [selectedOption, setSelectedOption] = useState("");
     let [quizFeedback, setQuizFeedback] = useState("");
 
     # NEW: student level state
@@ -354,6 +363,67 @@ def app() -> any {
         # setQuizAnswer("");
     }
 
+
+
+
+    # async def handleQuizSubmit(optionValue: str) -> None {
+    # # 1) Require a selected option
+    #     if not optionValue.trim() {
+    #         setQuizFeedback("Please select an answer.");
+    #         return;
+    #     }
+
+    #     # 2) Call backend walker to check answer
+    #     result = root spawn quiz_answer_walker(user_answer=optionValue);
+    #     console.log("Quiz answer result:", result);
+
+    #     # 3) Extract the feedback string from reports
+    #     feedback = "No response from backend.";
+
+    #     if result and result.reports and result.reports.length > 0 {
+    #         last = result.reports[result.reports.length - 1];
+
+    #         if typeof(last) == "string" {
+    #             feedback = last;
+    #         } elif last.response {
+    #             feedback = last.response;
+    #         } elif last.output {
+    #             feedback = last.output;
+    #         } else {
+    #             feedback = JSON.stringify(last, null, 2);
+    #         }
+    #     }
+
+    #     setQuizFeedback(feedback);
+
+    #     # NEW: fetch updated student level from backend
+    #     levelResult = root spawn levelwalker();
+    #     console.log("Level walker result:", levelResult);
+
+    #     levelStr = "";
+
+    #     if levelResult and levelResult.reports and levelResult.reports.length > 0 {
+    #         lastLevel = levelResult.reports[levelResult.reports.length - 1];
+
+    #         if typeof(lastLevel) == "string" {
+    #             levelStr = lastLevel;
+    #         } elif lastLevel.level {
+    #             levelStr = lastLevel.level;
+    #         } elif lastLevel.response {
+    #             levelStr = lastLevel.response;
+    #         } elif lastLevel.output {
+    #             levelStr = lastLevel.output;
+    #         } else {
+    #             levelStr = JSON.stringify(lastLevel, null, 2);
+    #         }
+    #     }
+
+    #     if levelStr {
+    #         setStudentLevel(levelStr);
+    #     }
+    # }
+
+
     return <div style={{
         "minHeight": "100vh",
         "padding": "32px 16px",
@@ -445,7 +515,7 @@ def app() -> any {
                     setQuizAnswer={setQuizAnswer}
                     setQuizFeedback={setQuizFeedback}
                     onSubmitQuiz={handleQuizSubmit}
-                    studentLevel={studentLevel}   # NEW
+                    studentLevel={studentLevel}  
                 />
                 <Block
                     title="Summarize"
