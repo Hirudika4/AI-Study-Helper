@@ -1,6 +1,8 @@
 import from react { useState }
+import from "@jac-client/utils" { Router, Routes, Route, Link }
 
-# Reusable block component for the 3 non-quiz panels
+
+# Reusable block component
 def Block(props: any) -> any {
     return <div style={{
         "background": "linear-gradient(135deg,#ffffff,#eef2ff)",
@@ -60,6 +62,8 @@ def Block(props: any) -> any {
     </div>;
 }
 
+
+# Quiz card
 def RenderQuizCard(props: any) -> any {
     return <div style={{
         "background": "linear-gradient(135deg,#eef2ff,#ecfeff)",
@@ -167,6 +171,7 @@ def RenderQuizCard(props: any) -> any {
             {props.quizFeedback}
         </div>
 
+        
         # NEW: Student level display box
         <div style={{
             "marginTop": "8px",
@@ -182,7 +187,9 @@ def RenderQuizCard(props: any) -> any {
     </div>;
 }
 
-def app() -> any {
+
+# Study workspace page 
+def StudyPage() -> any {
 
     let [inputText, setInputText] = useState("");
     let [quizText, setQuizText] = useState("");
@@ -212,17 +219,17 @@ def app() -> any {
 
         lowered = inputText.toLowerCase();
 
-        # --- always run task_manager (quiz / summarize / flashcards) ---
+        # Always run task_manager (quiz / summarize / flashcards) ---
         mainResult = root spawn task_manager(utterance=inputText);
         console.log("Main result from task_manager:", mainResult);
 
-        # --- optionally run explanationwalker when needed ---
+        # Optionally run explanationwalker when needed
         explanationResult = null;
         if lowered.includes("explain") or lowered.includes("explanation") {
             explanationResult = root spawn explainationwalker(utterance=inputText);
         }
 
-        # --- collect reports from BOTH walkers ---
+        # collect reports from BOTH walkers
         allReports = [];
 
         if mainResult.reports {
@@ -242,12 +249,10 @@ def app() -> any {
             if typeof(last) == "string" {
                 output_str = last;
             } elif last.response {
-                # if your backend reports { "response": "..." }
                 output_str = last.response;
             } elif last.output {
                 output_str = last.output;
             } else {
-                # fallback – stringify object
                 output_str = JSON.stringify(last, null, 2);
             }
         } else {
@@ -278,11 +283,10 @@ def app() -> any {
         elif lowered.includes("explain") or lowered.includes("explanation") {
             setQuizText("");
             setSummaryText("");
-            setExplanationText(output_str);  # explanation card
+            setExplanationText(output_str);
             setFlashcardText("");
         }
         else {
-            # default: treat as explanation-ish text
             setQuizText("");
             setSummaryText("");
             setExplanationText(output_str);
@@ -353,6 +357,10 @@ def app() -> any {
         # optional: clear the input
         # setQuizAnswer("");
     }
+
+
+
+
 
     return <div style={{
         "minHeight": "100vh",
@@ -469,3 +477,141 @@ def app() -> any {
         </div>
     </div>;
 }
+
+
+# Home page 
+def HomePage() -> any {
+    return <div style={{
+        "minHeight": "100vh",
+        "display": "flex",
+        "flexDirection": "column",
+        "background": "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 40%, #93c5fd 100%)",
+        "backgroundSize": "cover",
+        "backgroundPosition": "center",
+        "backgroundRepeat": "no-repeat"
+    }}>
+
+    
+
+        <div style={{
+            "flex": 1,
+            "display": "flex",
+            "justifyContent": "center",
+            "alignItems": "center",
+            "padding": "30px"
+        }}>
+            <div style={{
+                "width": "840px",
+                "background": "rgba(255,255,255,0.88)",
+                "backdropFilter": "blur(10px)",
+                "padding": "36px 48px",
+                "borderRadius": "22px",
+                "textAlign": "center",
+                "boxShadow": "0 18px 55px rgba(0,0,0,0.25)"
+            }}>
+
+                <h1 style={{
+                    "fontSize": "42px",
+                    "marginBottom": "16px",
+                    "color": "#1d4ed8",
+                    "fontWeight": "750"
+                }}>
+                    AI Study Helper
+                </h1>
+
+                <p style={{
+                    "fontSize": "16px",
+                    "color": "#334155",
+                    "marginBottom": "26px"
+                }}>
+                    Turn your notes into quizzes, summaries, explanations, and flashcards.
+                </p>
+
+                <Link to="/study">
+                    <button style={{
+                        "padding": "12px 32px",
+                        "fontSize": "16px",
+                        "fontWeight": "650",
+                        "borderRadius": "999px",
+                        "border": "none",
+                        "color": "white",
+                        "cursor": "pointer",
+                        "background": "linear-gradient(135deg,#2563eb,#4f46e5)",
+                        "boxShadow": "0 10px 25px rgba(37,99,235,0.4)",
+                        "marginBottom": "18px"
+                    }}>
+                        Open Study Workspace
+                    </button>
+                </Link>
+
+                <div style={{
+                    "padding": "14px 20px",
+                    "fontSize": "14px",
+                    "color": "#475569",
+                    "background": "rgba(255,255,255,0.7)",
+                    "borderRadius": "14px",
+                    "border": "1px dashed #cbd5e1"
+                }}>
+                    <b>Tip:</b> Paste any passage in the Workspace and ask:<br />
+                    • “Create a quiz with 5 MCQs”<br />
+                    • “Summarize this”<br />
+                    • “Explain like I’m 10”<br />
+                    • “Make flashcards”
+                </div>
+
+            </div>
+        </div>
+    </div>;
+}
+
+
+
+# Router root (entry app)
+def app() -> any {
+    return <Router>
+        <div>
+            <nav style={{
+                "display": "flex",
+                "justifyContent": "center",
+                "gap": "16px",
+                "padding": "10px 16px",
+                "background": "rgba(15,23,42,0.95)",
+                "color": "#e5e7eb",
+                "fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                "fontSize": "13px"
+            }}>
+                <Link
+                    to="/"
+                    style={{
+                        "color": "#e5e7eb",
+                        "textDecoration": "none",
+                        "padding": "6px 10px",
+                        "borderRadius": "999px"
+                    }}
+                >
+                    Home
+                </Link>
+                <Link
+                    to="/study"
+                    style={{
+                        "color": "#e5e7eb",
+                        "textDecoration": "none",
+                        "padding": "6px 10px",
+                        "borderRadius": "999px"
+                    }}
+                >
+                    Study Workspace
+                </Link>
+            </nav>
+
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/study" element={<StudyPage />} />
+            </Routes>
+        </div>
+    </Router>;
+}
+
+
+
+
