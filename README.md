@@ -1,5 +1,7 @@
 # AI-Study-Helper
 
+<img width="1894" height="902" alt="Screenshot 2025-12-05 184232" src="https://github.com/user-attachments/assets/2b149fe1-02a9-40bd-8236-8c0bde59b591" />
+
 AI Study Helper is a smart study companion built using Jac, walkers, and a modern React-style UI.
 
 It transforms any text into structured study material using a system of specialized AI agents.
